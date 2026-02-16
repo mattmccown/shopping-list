@@ -75,24 +75,17 @@
       'Other': '🏷️'
     };
     
-    // Load from localStorage or use default
-    let items = JSON.parse(localStorage.getItem('shoppingList')) || [
-      // Dierbergs
-      { id: 1, text: 'Milk 2%', category: 'Dairy', store: 'Dierbergs', checked: false },
-      { id: 2, text: 'Eggs large', category: 'Dairy', store: 'Dierbergs', checked: false },
-      { id: 3, text: 'Bananas', category: 'Produce', store: 'Dierbergs', checked: false },
-      { id: 4, text: 'Chicken breast', category: 'Meat', store: 'Dierbergs', checked: false },
-      { id: 5, text: 'Cheddar cheese', category: 'Dairy', store: 'Dierbergs', checked: false },
-      // Target
-      { id: 6, text: 'Paper towels', category: 'Other', store: 'Target', checked: false },
-      { id: 7, text: 'Dish soap', category: 'Other', store: 'Target', checked: false },
-      { id: 8, text: 'Kids snacks', category: 'Pantry', store: 'Target', checked: false },
-      // Sam's Club
-      { id: 9, text: 'Bulk eggs', category: 'Dairy', store: 'Sam\'s Club', checked: false },
-      { id: 10, text: 'Bread loaf', category: 'Bakery', store: 'Sam\'s Club', checked: false },
-      { id: 11, text: 'Ground beef', category: 'Meat', store: 'Sam\'s Club', checked: false },
-      { id: 12, text: 'Frozen pizza', category: 'Frozen', store: 'Sam\'s Club', checked: false },
-    ];
+    // Load from JSON (shared) or fallback to localStorage
+    async function loadItems() {
+      try {
+        const r = await fetch('items.json');
+        items = await r.json();
+      } catch(e) {
+        items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+      }
+      renderItems();
+    }
+    loadItems();
     
     let currentFilter = 'all';
     
