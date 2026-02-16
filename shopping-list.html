@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🛒 Shopping List</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; background: #f5f5f5; }
+    h1 { color: #333; text-align: center; }
+    .category { margin: 20px 0; }
+    .category h3 { color: #4a90d9; border-bottom: 2px solid #4a90d9; padding-bottom: 5px; }
+    .item { display: flex; align-items: center; background: white; padding: 12px; margin: 5px 0; border-radius: 8px; border: 1px solid #ddd; }
+    .item.checked { background: #e8f5e9; text-decoration: line-through; opacity: 0.6; }
+    .item input { width: 24px; height: 24px; margin-right: 15px; }
+    .item span { flex: 1; }
+    .remove { color: #ff6b6b; cursor: pointer; font-size: 20px; margin-left: 10px; }
+    .add-form { background: white; padding: 20px; border-radius: 12px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .add-form input, .add-form select { padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 6px; }
+    .add-form button { width: 100%; padding: 12px; background: #4a90d9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+    .stats { text-align: center; color: #666; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🛒 Shopping List</h1>
+  
+  <div id="list"></div>
+  
+  <div class="add-form">
+    <h3>➕ Add Item</h3>
+    <input type="text" id="newItem" placeholder="Item name" style="width: 60%;">
+    <select id="newCategory" style="width: 35%;">
+      <option value="Produce">Produce</option>
+      <option value="Dairy">Dairy</option>
+      <option value="Meat">Meat</option>
+      <option value="Pantry">Pantry</option>
+      <option value="Frozen">Frozen</option>
+      <option value="Bakery">Bakery</option>
+      <option value="Other">Other</option>
+    </select>
+    <button onclick="addItem()">Add</button>
+  </div>
+  
+  <div class="stats">
+    <span id="checkedCount">0</span> of <span id="totalCount">0</span> items checked
+  </div>
+
+  <script>
+    const categories = ['Produce', 'Dairy', 'Meat', 'Pantry', 'Frozen', 'Bakery', 'Other'];
+    
+    // Load from localStorage or use default
+    let items = JSON.parse(localStorage.getItem('shoppingList')) || [
+      { id: 1, text: 'Tomatoes', category: 'Produce', checked: false },
+      { id: 2, text: 'Onion', category: 'Produce', checked: false },
+      { id: 3, text: 'Cheese', category: 'Dairy', checked: false },
+      { id: 4, text: 'Bread', category: 'Bakery', checked: false },
+      { id: 5, text: 'Butter', category: 'Dairy', checked: false },
+      { id: 6, text: 'Ground beef', category: 'Meat', checked: false },
+      { id: 7, text: 'Tortillas', category: 'Pantry', checked: false },
+      { id: 8, text: 'Eggs', category: 'Dairy', checked: false },
+    ];
+    
+    function save() {
+      localStorage.setItem('shoppingList', JSON.stringify(items));
+      render();
+    }
+    
+    function toggle(id) {
+      const item = items.find(i => i.id === id);
+      if (item) {
+        item.checked = !item.checked;
+        save();
+      }
+    }
+    
+    function remove(id) {
+      items = items.filter(i => i.id !== id);
+      save();
+    }
+    
+    function addItem() {
+      const input = document.getElementById('newItem');
+      const category = document.getElementById('newCategory').value;
+      if (input.value.trim()) {
+        items.push({
+          id: Date.now(),
+          text: input.value.trim(),
+          category: category,
+          checked: false
+        });
+        input.value = '';
+        save();
+      }
+    }
+    
+    function render() {
+      const list = document.getElementById('list');
+      let html = '';
+      
+      categories.forEach(cat => {
+        const catItems = items.filter(i => i.category === cat);
+        if (catItems.length > 0) {
+          html += `<div class="category"><h3>${cat}</h3>`;
+          catItems.forEach(item => {
+            html += `
+              <div class="item ${item.checked ? 'checked' : ''}">
+                <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggle(${item.id})">
+                <span>${item.text}</span>
+                <span class="remove" onclick="remove(${item.id})">👎</span>
+              </div>
+            `;
+          });
+          html += '</div>';
+        }
+      });
+      
+      list.innerHTML = html || '<p style="text-align:center;color:#999;">No items yet</p>';
+      
+      const checked = items.filter(i => i.checked).length;
+      document.getElementById('checkedCount').textContent = checked;
+      document.getElementById('totalCount').textContent = items.length;
+    }
+    
+    render();
+  </script>
+</body>
+</html>
