@@ -78,7 +78,7 @@
     // Load from JSON (shared) or fallback to localStorage
     async function loadItems() {
       try {
-        const r = await fetch('items.json?t=20260216');
+        const r = await fetch('https://mattmccown.github.io/shopping-list/items.json');
         items = await r.json();
       } catch(e) {
         items = JSON.parse(localStorage.getItem('shoppingList')) || [];
