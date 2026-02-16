@@ -144,9 +144,18 @@
       
       const filteredItems = currentFilter === 'all' ? items : items.filter(i => i.store === currentFilter);
       
-      // Group by store
+      // Group by store, then sort by category within each store
+      const categoryOrder = ['Produce', 'Dairy', 'Meat', 'Bakery', 'Frozen', 'Pantry', 'Other'];
+      
       Object.keys(stores).forEach(store => {
         const storeItems = filteredItems.filter(i => i.store === store);
+        // Sort by category order, then by name
+        storeItems.sort((a, b) => {
+          const aIdx = categoryOrder.indexOf(a.category);
+          const bIdx = categoryOrder.indexOf(b.category);
+          if (aIdx !== bIdx) return aIdx - bIdx;
+          return a.text.localeCompare(b.text);
+        });
         if (storeItems.length > 0) {
           html += `<div class="store-section">
             <div class="store-header">
